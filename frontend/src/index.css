@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-textPrimary;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-700 text-white px-6 py-3 rounded-2xl hover:bg-primary-800 
+           transition-all duration-300 font-semibold shadow-lg hover:shadow-glow 
+           hover:scale-105 active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary-900 text-white px-6 py-3 rounded-2xl hover:bg-secondary-800 
+           transition-all duration-300 font-semibold shadow-lg hover:shadow-xl 
+           hover:scale-105 active:scale-95;
+  }
+  
+  .btn-accent {
+    @apply bg-accent-400 text-secondary-900 px-6 py-3 rounded-2xl hover:bg-accent-500 
+           transition-all duration-300 font-semibold shadow-lg hover:shadow-xl 
+           hover:scale-105 active:scale-95;
+  }
+  
+  .input-field {
+    @apply w-full px-5 py-3 border-2 border-gray-200 rounded-2xl 
+           focus:ring-2 focus:ring-primary-700 focus:border-primary-700 
+           outline-none transition-all duration-300 shadow-sm hover:shadow-md
+           placeholder:text-gray-400;
+  }
+  
+  .card {
+    @apply bg-white rounded-2xl shadow-card p-6 hover:shadow-card-hover 
+           transition-all duration-300 hover:scale-[1.02];
+  }
+  
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary-700 to-secondary-900;
+  }
+  
+  .gradient-accent {
+    @apply bg-gradient-to-r from-accent-400 to-accent-500;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-700 to-primary-500 bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-accent {
+    @apply bg-gradient-to-r from-accent-400 via-accent-500 to-primary-700 bg-clip-text text-transparent;
+  }
+  
+  /* Floating Animation */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  /* Pulse Glow Animation */
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(29, 78, 216, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(29, 78, 216, 0.8); }
+  }
+  
+  /* Shimmer Effect */
+  .shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  /* Bounce In Animation */
+  .animate-bounce-in {
+    animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  @keyframes bounce-in {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  /* Slide In From Left */
+  .animate-slide-in-left {
+    animation: slide-in-left 0.5s ease-out;
+  }
+  
+  @keyframes slide-in-left {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  /* Slide In From Right */
+  .animate-slide-in-right {
+    animation: slide-in-right 0.5s ease-out;
+  }
+  
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  /* Rotate In */
+  .animate-rotate-in {
+    animation: rotate-in 0.6s ease-out;
+  }
+  
+  @keyframes rotate-in {
+    from { transform: rotate(-180deg) scale(0); opacity: 0; }
+    to { transform: rotate(0) scale(1); opacity: 1; }
+  }
+  
+  /* Gradient Border Animation */
+  .gradient-border {
+    position: relative;
+    background: white;
+    border-radius: 1rem;
+  }
+  
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 1rem;
+    padding: 2px;
+    background: linear-gradient(45deg, #1D4ED8, #FBBF24, #1D4ED8);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: gradient-rotate 3s linear infinite;
+  }
+  
+  @keyframes gradient-rotate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}
