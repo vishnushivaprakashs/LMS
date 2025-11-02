@@ -10,6 +10,6 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "@vite_api_url"
+  "VITE_API_URL": "https://lms-jv9s.onrender.com"
   }
 }
