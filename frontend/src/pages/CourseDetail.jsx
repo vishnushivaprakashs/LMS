@@ -90,6 +90,12 @@ const CourseDetail = () => {
       
       // Re-fetch enrollment status to get complete data
       await checkEnrollmentStatus();
+      
+      // Force page refresh and redirect to my-courses page after 1.5 seconds
+      setTimeout(() => {
+        navigate('/student/my-courses', { replace: true });
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to enroll in course';
       showToast(errorMessage, 'error');

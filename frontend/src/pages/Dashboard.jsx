@@ -1,12 +1,81 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { BookOpen, Users, FileText, Award, Home, Search, User, Settings, LogOut, TrendingUp, Clock, Target, Sparkles } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import enrollmentService from '../services/enrollmentService';
+import courseService from '../services/courseService';
 
 const Dashboard = () => {
   const { user, isInstructor, isStudent, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [stats, setStats] = useState({
+    enrolledCourses: 0,
+    hoursLearned: 0,
+    completedPercentage: 0,
+    certificates: 0,
+    totalStudents: 0,
+    myCourses: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [isStudent, isInstructor]);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      if (isStudent) {
+        const response = await enrollmentService.getMyEnrollments();
+        const enrollments = response.data || [];
+        
+        const enrolled = enrollments.length;
+        const completed = enrollments.filter(e => e.status === 'completed').length;
+        const completedPercentage = enrolled > 0 ? Math.round((completed / enrolled) * 100) : 0;
+        
+        // Calculate total hours from actual time spent (in minutes)
+        const totalMinutes = enrollments.reduce((sum, e) => {
+          // Get time spent from progress or calculate from completed lessons
+          const timeSpent = e.progress?.timeSpent || 0;
+          return sum + timeSpent;
+        }, 0);
+        
+        // Convert minutes to hours (show minutes if less than 60)
+        const hoursLearned = totalMinutes >= 60 
+          ? Math.round(totalMinutes / 60) 
+          : totalMinutes;
+        
+        setStats({
+          enrolledCourses: enrolled,
+          hoursLearned: hoursLearned,
+          completedPercentage: completedPercentage,
+          certificates: completed,
+          totalStudents: 0,
+          myCourses: 0
+        });
+      } else if (isInstructor) {
+        const response = await courseService.getMyInstructorCourses();
+        const courses = response.data || [];
+        
+        const totalStudents = courses.reduce((sum, course) => sum + (course.enrollmentCount || 0), 0);
+        const totalCourses = courses.length;
+        
+        setStats({
+          enrolledCourses: 0,
+          hoursLearned: 0,
+          completedPercentage: 0,
+          certificates: 0,
+          totalStudents: totalStudents,
+          myCourses: totalCourses
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -21,20 +90,20 @@ const Dashboard = () => {
   ];
 
   const studentStats = [
-    { icon: BookOpen, label: 'Enrolled Courses', value: '0', color: 'bg-primary-100 text-primary-700', iconColor: 'text-primary-700' },
-    { icon: Clock, label: 'Hours Learned', value: '0h', color: 'bg-accent-100 text-accent-700', iconColor: 'text-accent-400' },
-    { icon: Target, label: 'Completed', value: '0%', color: 'bg-green-100 text-green-700', iconColor: 'text-green-600' },
-    { icon: Award, label: 'Certificates', value: '0', color: 'bg-purple-100 text-purple-700', iconColor: 'text-purple-600' },
+    { icon: BookOpen, label: 'Enrolled Courses', value: loading ? '...' : stats.enrolledCourses, color: 'bg-primary-100 text-primary-700', iconColor: 'text-primary-700' },
+    { icon: Clock, label: 'Time Spent', value: loading ? '...' : stats.hoursLearned >= 60 ? `${stats.hoursLearned}h` : `${stats.hoursLearned}m`, color: 'bg-accent-100 text-accent-700', iconColor: 'text-accent-400' },
+    { icon: Target, label: 'Completed', value: loading ? '...' : `${stats.completedPercentage}%`, color: 'bg-green-100 text-green-700', iconColor: 'text-green-600' },
+    { icon: Award, label: 'Certificates', value: loading ? '...' : stats.certificates, color: 'bg-purple-100 text-purple-700', iconColor: 'text-purple-600' },
   ];
 
   const instructorStats = [
-    { icon: BookOpen, label: 'My Courses', value: '0', color: 'bg-primary-100 text-primary-700', iconColor: 'text-primary-700' },
-    { icon: Users, label: 'Total Students', value: '0', color: 'bg-accent-100 text-accent-700', iconColor: 'text-accent-400' },
+    { icon: BookOpen, label: 'My Courses', value: loading ? '...' : stats.myCourses, color: 'bg-primary-100 text-primary-700', iconColor: 'text-primary-700' },
+    { icon: Users, label: 'Total Students', value: loading ? '...' : stats.totalStudents, color: 'bg-accent-100 text-accent-700', iconColor: 'text-accent-400' },
     { icon: TrendingUp, label: 'Engagement', value: '0%', color: 'bg-green-100 text-green-700', iconColor: 'text-green-600' },
     { icon: FileText, label: 'Assignments', value: '0', color: 'bg-purple-100 text-purple-700', iconColor: 'text-purple-600' },
   ];
 
-  const stats = isInstructor ? instructorStats : studentStats;
+  const displayStats = isInstructor ? instructorStats : studentStats;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -103,7 +172,7 @@ const Dashboard = () => {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, index) => (
+            {displayStats.map((stat, index) => (
               <div 
                 key={index} 
                 className="card group animate-scale-in"
@@ -179,27 +248,28 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Coming Soon Notice */}
-          <div className="mt-8 card bg-gradient-to-r from-primary-50 to-accent-50 border-2 border-primary-200">
+          {/* Platform Features */}
+          <div className="mt-8 card bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200">
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-primary-700 rounded-2xl flex items-center justify-center">
-                  <Sparkles className="h-6 w-6 text-accent-400" />
+                <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center">
+                  <Sparkles className="h-6 w-6 text-white" />
                 </div>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-primary-900 mb-2">
-                  🚀 Exciting Features Coming Soon!
+                <h3 className="text-xl font-bold text-green-900 mb-2">
+                  ✨ All Features Available!
                 </h3>
-                <p className="text-primary-800 mb-3">
-                  We're working hard to bring you amazing new features including course management, 
-                  enrollment system, interactive content, and much more!
+                <p className="text-green-800 mb-3">
+                  Your learning platform is fully equipped with course management, video lessons, 
+                  progress tracking, certificates, and real-time notifications!
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-white rounded-full text-xs font-semibold text-primary-700">Course Creation</span>
-                  <span className="px-3 py-1 bg-white rounded-full text-xs font-semibold text-primary-700">Video Lessons</span>
-                  <span className="px-3 py-1 bg-white rounded-full text-xs font-semibold text-primary-700">Assignments</span>
-                  <span className="px-3 py-1 bg-white rounded-full text-xs font-semibold text-primary-700">Certificates</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-xs font-semibold text-green-700">✅ Course Creation</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-xs font-semibold text-green-700">✅ Video Lessons</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-xs font-semibold text-green-700">✅ Progress Tracking</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-xs font-semibold text-green-700">✅ Certificates</span>
+                  <span className="px-3 py-1 bg-white rounded-full text-xs font-semibold text-green-700">✅ Notifications</span>
                 </div>
               </div>
             </div>

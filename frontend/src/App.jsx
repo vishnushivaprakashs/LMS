@@ -17,6 +17,7 @@ import Learn from './pages/Learn';
 import Certificate from './pages/Certificate';
 import VerifyCertificate from './pages/VerifyCertificate';
 import Unauthorized from './pages/Unauthorized';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -115,8 +116,8 @@ function App() {
               }
             />
 
-            {/* Catch all - redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Catch all - 404 page */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </AuthProvider>

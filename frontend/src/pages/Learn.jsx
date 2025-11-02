@@ -210,6 +210,42 @@ const Learn = () => {
       )}
 
       <div className="min-h-screen bg-background">
+        {/* Course Completion Banner */}
+        {enrollment.status === 'completed' && (
+          <div className="bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-6">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center space-x-3">
+                <Award className="h-8 w-8" />
+                <div>
+                  <h3 className="text-xl font-bold">🎉 Course Completed!</h3>
+                  <p className="text-green-100">Congratulations on finishing this course!</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => navigate(`/courses/${id}`)}
+                  className="px-6 py-2 bg-white text-green-600 rounded-xl font-semibold hover:bg-green-50 transition-all"
+                >
+                  View Course Details
+                </button>
+                <button
+                  onClick={() => navigate('/student/my-courses')}
+                  className="px-6 py-2 bg-green-700 text-white rounded-xl font-semibold hover:bg-green-800 transition-all"
+                >
+                  My Courses
+                </button>
+                <button
+                  onClick={() => setShowRatingModal(true)}
+                  className="px-6 py-2 bg-yellow-400 text-gray-900 rounded-xl font-semibold hover:bg-yellow-300 transition-all flex items-center space-x-2"
+                >
+                  <Star className="h-5 w-5" />
+                  <span>Rate Course</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col lg:flex-row h-screen">
           {/* Video Player Section */}
           <div className="flex-1 flex flex-col bg-black">

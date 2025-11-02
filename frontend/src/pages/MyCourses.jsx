@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { BookOpen, Clock, Award, TrendingUp, Play, Star } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { BookOpen, Clock, Award, TrendingUp, Play, Star, ArrowLeft } from 'lucide-react';
 import enrollmentService from '../services/enrollmentService';
 import courseService from '../services/courseService';
 import { useAuth } from '../hooks/useAuth';
@@ -8,6 +8,7 @@ import Toast from '../components/Toast';
 
 const MyCourses = () => {
   const { isInstructor, isStudent, user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
@@ -93,6 +94,15 @@ const MyCourses = () => {
 
       <div className="min-h-screen bg-background py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Back Button */}
+          <button
+            onClick={() => navigate(-1)}
+            className="mb-6 flex items-center space-x-2 text-gray-600 hover:text-primary-700 transition-colors group"
+          >
+            <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-semibold">Back</span>
+          </button>
+
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-textPrimary mb-2">
